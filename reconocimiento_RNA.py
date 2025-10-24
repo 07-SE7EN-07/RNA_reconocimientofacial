@@ -2,6 +2,8 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import numpy as np
+import matplotlib.pyplot as plt
 
 # Definir el modelo CNN para el reconocimiento facial
 model = Sequential([
@@ -42,3 +44,24 @@ model.fit(train_generator, epochs=10)
 
 # Evaluar el modelo
 model.evaluate(test_generator)
+
+# Obtener etiquetas reales
+y_true = test_generator.classes
+
+# Obtener nombres de clase
+class_names = list(test_generator.class_indices.keys())
+
+# Predicciones
+y_pred = model.predict(test_generator)
+salida = np.argmax(y_pred, axis=1)
+
+# Mostrar resultados
+print("ETIQUETAS REALES:", y_true)
+print("PREDICCIONES:", salida)
+
+# Mostrar nombres de clase predichos
+print("CLASES REALES:", [class_names[i] for i in y_true])
+print("CLASES PREDICHAS:", [class_names[i] for i in salida])
+
+plt.imshow(test_generator[0][0][0])  # Mostrar la primera imagen del primer batch
+plt.show()
