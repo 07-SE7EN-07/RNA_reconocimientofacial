@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 model = Sequential([
-    Conv2D(32, (3, 3), activation='relu', input_shape=(200, 200, 3)),
+    Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 3)),
     MaxPooling2D(2, 2),
     Conv2D(64, (3, 3), activation='relu'),
     MaxPooling2D(2, 2),
@@ -22,20 +22,20 @@ test_datagen = ImageDataGenerator(rescale=1./255)
 
 train_generator = train_datagen.flow_from_directory(
     'dataset/train',
-    target_size=(200, 200),
+    target_size=(128, 128),
     batch_size=3,
     class_mode='sparse'
 )
 
 test_generator = test_datagen.flow_from_directory(
     'dataset/test',
-    target_size=(200, 200),
+    target_size=(128, 128),
     batch_size=3,
     class_mode='sparse',
     shuffle=False
 )
 
-history = model.fit(train_generator, validation_data=test_generator, epochs=50)
+history = model.fit(train_generator, validation_data=test_generator, epochs=5)
 
 model.evaluate(test_generator)
 
