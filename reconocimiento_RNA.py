@@ -11,19 +11,34 @@ model = Sequential([
     MaxPooling2D(pool_size=(2, 2)),
     Flatten(),
     Dense(128, activation='relu'),
-    Dense(10, activation='softmax')  # Suponiendo que hay 10 clases de personas
+    Dense(3, activation='softmax')  # Cambié esto a 3 para las 3 personas que tienes
 ])
 
 # Compilar el modelo
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-# Cargar el conjunto de datos (esto puede variar dependiendo del dataset)
-train_datagen = ImageDataGenerator(rescale=1./255, horizontal_flip=True)
-train_generator = train_datagen.flow_from_directory('ruta/a/tu/dataset', target_size=(64, 64), batch_size=32, class_mode='sparse')
+# Generador de datos con aumento de datos (esto es útil cuando tienes pocas imágenes)
+train_datagen = ImageDataGenerator(rescale=1./255, horizontal_flip=True, rotation_range=20, width_shift_range=0.2, height_shift_range=0.2, zoom_range=0.2)
+test_datagen = ImageDataGenerator(rescale=1./255)
+
+# Cargar el conjunto de datos de entrenamiento
+train_generator = train_datagen.flow_from_directory(
+    'ruta/a/tu/dataset/train',  # La ruta a la carpeta de entrenamiento
+    target_size=(64, 64),
+    batch_size=3,  # Usamos un batch pequeño ya que tienes pocas imágenes
+    class_mode='sparse'  # Usamos sparse porque cada clase es un entero
+)
+
+# Cargar el conjunto de datos de prueba
+test_generator = test_datagen.flow_from_directory(
+    'ruta/a/tu/dataset/test',  # La ruta a la carpeta de test
+    target_size=(64, 64),
+    batch_size=3,
+    class_mode='sparse'
+)
 
 # Entrenar el modelo
 model.fit(train_generator, epochs=10)
 
-# Evaluar el modelo (en un conjunto de datos de prueba)
-test_generator = train_datagen.flow_from_directory('ruta/a/tu/test_dataset', target_size=(64, 64), batch_size=32, class_mode='sparse')
+# Evaluar el modelo
 model.evaluate(test_generator)
