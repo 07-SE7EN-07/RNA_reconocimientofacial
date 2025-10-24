@@ -23,7 +23,7 @@ test_datagen = ImageDataGenerator(rescale=1./255)
 
 # Cargar el conjunto de datos de entrenamiento
 train_generator = train_datagen.flow_from_directory(
-    'ruta/a/tu/dataset/train',  # La ruta a la carpeta de entrenamiento
+    'dataset/train',  # La ruta a la carpeta de entrenamiento
     target_size=(64, 64),
     batch_size=3,  # Usamos un batch pequeño ya que tienes pocas imágenes
     class_mode='sparse'  # Usamos sparse porque cada clase es un entero
@@ -31,7 +31,7 @@ train_generator = train_datagen.flow_from_directory(
 
 # Cargar el conjunto de datos de prueba
 test_generator = test_datagen.flow_from_directory(
-    'ruta/a/tu/dataset/test',  # La ruta a la carpeta de test
+    'dataset/test',  # La ruta a la carpeta de test
     target_size=(64, 64),
     batch_size=3,
     class_mode='sparse'
