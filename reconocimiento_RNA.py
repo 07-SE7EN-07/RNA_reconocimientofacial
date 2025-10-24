@@ -6,12 +6,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 model = Sequential([
-    Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3)),
+    Conv2D(32, (3, 3), activation='relu', input_shape=(200, 200, 3)),
     MaxPooling2D(2, 2),
     Conv2D(64, (3, 3), activation='relu'),
     MaxPooling2D(2, 2),
     Flatten(),
-    Dense(128, activation='relu'),
+    Dense(64, activation='relu'),
     Dense(3, activation='softmax')
 ])
 
@@ -22,14 +22,14 @@ test_datagen = ImageDataGenerator(rescale=1./255)
 
 train_generator = train_datagen.flow_from_directory(
     'dataset/train',
-    target_size=(64, 64),
+    target_size=(200, 200),
     batch_size=3,
     class_mode='sparse'
 )
 
 test_generator = test_datagen.flow_from_directory(
     'dataset/test',
-    target_size=(64, 64),
+    target_size=(200, 200),
     batch_size=3,
     class_mode='sparse',
     shuffle=False
