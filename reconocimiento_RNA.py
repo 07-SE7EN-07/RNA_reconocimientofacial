@@ -5,53 +5,47 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Definir el modelo CNN para el reconocimiento facial
+# Modelo CNN
 model = Sequential([
     Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3)),
-    MaxPooling2D(pool_size=(2, 2)),
+    MaxPooling2D(2, 2),
     Conv2D(64, (3, 3), activation='relu'),
-    MaxPooling2D(pool_size=(2, 2)),
+    MaxPooling2D(2, 2),
     Flatten(),
     Dense(128, activation='relu'),
-    Dense(3, activation='softmax')  # Cambié esto a 3 para las 3 personas que tienes
+    Dense(3, activation='softmax')  # 3 clases: alvin, simon, teodoro
 ])
 
-# Compilar el modelo
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-# Generador de datos con aumento de datos (esto es útil cuando tienes pocas imágenes)
-train_datagen = ImageDataGenerator(rescale=1./255, horizontal_flip=True, rotation_range=20, width_shift_range=0.2, height_shift_range=0.2, zoom_range=0.2)
+# Generadores de datos
+train_datagen = ImageDataGenerator(rescale=1./255, horizontal_flip=True, rotation_range=20,
+                                   width_shift_range=0.2, height_shift_range=0.2, zoom_range=0.2)
 test_datagen = ImageDataGenerator(rescale=1./255)
 
-# Cargar el conjunto de datos de entrenamiento
 train_generator = train_datagen.flow_from_directory(
-    'dataset/train',  # La ruta a la carpeta de entrenamiento
-    target_size=(64, 64),
-    batch_size=3,  # Usamos un batch pequeño ya que tienes pocas imágenes
-    class_mode='sparse'  # Usamos sparse porque cada clase es un entero
-)
-
-# Cargar el conjunto de datos de prueba
-test_generator = test_datagen.flow_from_directory(
-    'dataset/test',  # La ruta a la carpeta de test
+    'dataset/train',
     target_size=(64, 64),
     batch_size=3,
     class_mode='sparse'
 )
 
-# Entrenar el modelo
-model.fit(train_generator, epochs=10)
+test_generator = test_datagen.flow_from_directory(
+    'dataset/test',
+    target_size=(64, 64),
+    batch_size=3,
+    class_mode='sparse',
+    shuffle=False  # importante para que las etiquetas coincidan
+)
 
-# Evaluar el modelo
+# Entrenamiento
+history = model.fit(train_generator, validation_data=test_generator, epochs=100)
+
+# Evaluación
 model.evaluate(test_generator)
 
-# Obtener etiquetas reales
+# Predicción
 y_true = test_generator.classes
-
-# Obtener nombres de clase
-class_names = list(test_generator.class_indices.keys())
-
-# Predicciones
 y_pred = model.predict(test_generator)
 salida = np.argmax(y_pred, axis=1)
 
@@ -59,9 +53,16 @@ salida = np.argmax(y_pred, axis=1)
 print("ETIQUETAS REALES:", y_true)
 print("PREDICCIONES:", salida)
 
-# Mostrar nombres de clase predichos
-print("CLASES REALES:", [class_names[i] for i in y_true])
-print("CLASES PREDICHAS:", [class_names[i] for i in salida])
+# Gráfico de precisión
+plt.plot(history.history['accuracy'], label='accuracy')
+plt.plot(history.history['val_accuracy'], label='val_accuracy')
+plt.legend()
+plt.grid()
+plt.show()
 
-plt.imshow(test_generator[0][0][0])  # Mostrar la primera imagen del primer batch
+# Mostrar una imagen del test
+X_batch, y_batch = test_generator[0]
+plt.imshow(X_batch[2])
+plt.title(f"Clase real: {y_batch[2]}, Predicción: {salida[2]}")
+plt.axis('off')
 plt.show()
