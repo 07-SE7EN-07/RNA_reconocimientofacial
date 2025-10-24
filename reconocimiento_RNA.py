@@ -19,8 +19,7 @@ model = Sequential([
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
 # Generadores de datos
-train_datagen = ImageDataGenerator(rescale=1./255, horizontal_flip=True, rotation_range=20,
-                                   width_shift_range=0.2, height_shift_range=0.2, zoom_range=0.2)
+train_datagen = ImageDataGenerator(rescale=1./255, horizontal_flip=True, rotation_range=20, width_shift_range=0.2, height_shift_range=0.2, zoom_range=0.2)
 test_datagen = ImageDataGenerator(rescale=1./255)
 
 train_generator = train_datagen.flow_from_directory(
@@ -39,7 +38,7 @@ test_generator = test_datagen.flow_from_directory(
 )
 
 # Entrenamiento
-history = model.fit(train_generator, validation_data=test_generator, epochs=100)
+history = model.fit(train_generator, validation_data=test_generator, epochs=50)
 
 # Evaluación
 model.evaluate(test_generator)
@@ -52,6 +51,10 @@ salida = np.argmax(y_pred, axis=1)
 # Mostrar resultados
 print("ETIQUETAS REALES:", y_true)
 print("PREDICCIONES:", salida)
+
+# Mostrar nombre de clases
+class_names = list(train_generator.class_indices.keys())
+print("NOMBRES DE CLASES:", class_names)
 
 # Gráfico de precisión
 plt.plot(history.history['accuracy'], label='accuracy')
